@@ -3,7 +3,7 @@ import qrcode
 
 vcard = """BEGIN:VCARD
 VERSION:3.0
-N:Warner;David;;;
+N:Smith;Steve;;;
 FN:David Warner
 ORG:Australian Cricket Team
 TITLE:Batter
