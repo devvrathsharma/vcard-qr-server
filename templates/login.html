@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login with Phone</title>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+</head>
+<body>
+  <h2>Login with Phone</h2>
+  <input type="text" id="phoneNumber" placeholder="+911234567890">
+  <div id="recaptcha-container"></div>
+  <button onclick="sendOTP()">Send OTP</button>
+
+  <br><br>
+  <input type="text" id="otp" placeholder="Enter OTP">
+  <button onclick="verifyOTP()">Verify OTP</button>
+
+  <script>
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      appId: "YOUR_APP_ID"
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+      'size': 'normal',
+      'callback': () => {}
+    });
+
+    function sendOTP() {
+      const phone = document.getElementById('phoneNumber').value;
+      firebase.auth().signInWithPhoneNumber(phone, window.recaptchaVerifier)
+        .then(confirmationResult => {
+          window.confirmationResult = confirmationResult;
+          alert("OTP sent!");
+        }).catch(console.error);
+    }
+
+    function verifyOTP() {
+      const code = document.getElementById('otp').value;
+      window.confirmationResult.confirm(code).then(result => {
+        // Send UID to Flask
+        fetch('/session-login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ uid: result.user.uid })
+        }).then(() => {
+          window.location.href = '/';
+        });
+      }).catch(error => alert("Invalid OTP"));
+    }
+  </script>
+</body>
+</html>

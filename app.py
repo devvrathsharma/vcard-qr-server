@@ -1,35 +1,28 @@
-from flask import Flask, render_template, request
-import qrcode
-import os
+from flask import Flask, render_template, request, session, redirect
+from flask_session import Session
 
 app = Flask(__name__)
+app.secret_key = "supersecret"
+app.config["SESSION_TYPE"] = "filesystem"
+Session(app)
 
-@app.route("/", methods=["GET", "POST"])
+@app.route("/")
 def index():
-    qr_generated = False
-    if request.method == "POST":
-        data = request.form
-        vcard = f"""BEGIN:VCARD
-VERSION:3.0
-N:{data['lastName']};{data['firstName']};;;
-FN:{data['firstName']} {data['lastName']}
-ORG:{data.get('organization', '')}
-TITLE:{data.get('title', '')}
-TEL;TYPE=CELL:{data.get('phone', '')}
-EMAIL:{data.get('email', '')}
-URL:{data.get('url', '')}
-ADR:;;{data.get('address', '')}
-NOTE:{data.get('note', '')}
-END:VCARD"""
+    if not session.get("uid"):
+        return redirect("/login")
+    return render_template("index.html", qr_generated=False)
 
-        # Generate QR and save
-        os.makedirs("static", exist_ok=True)
-        img = qrcode.make(vcard)
-        img.save("static/vcard_qr.png")
-        qr_generated = True
+@app.route("/login")
+def login():
+    return render_template("login.html")
 
-    return render_template("index.html", qr_generated=qr_generated)
+@app.route("/session-login", methods=["POST"])
+def session_login():
+    uid = request.json.get("uid")
+    session["uid"] = uid
+    return "Logged in"
 
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+@app.route("/logout")
+def logout():
+    session.pop("uid", None)
+    return redirect("/login")
