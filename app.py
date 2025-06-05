@@ -1,6 +1,13 @@
 from flask import Flask, render_template, request, session, redirect
 from flask_session import Session
 
+import os
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
+
+
 app = Flask(__name__)
 app.secret_key = "supersecret"
 app.config["SESSION_TYPE"] = "filesystem"
