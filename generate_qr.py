@@ -3,14 +3,14 @@ import qrcode
 
 vcard = """BEGIN:VCARD
 VERSION:3.0
-N:Doe;John;;;
-FN:John Doe
-ORG:Example Company
-TITLE:Software Engineer
-TEL;TYPE=CELL:+1234567890
-EMAIL:john.doe@example.com
+N:Warner;David;;;
+FN:David Warner
+ORG:Australian Cricket Team
+TITLE:Batter
+TEL;TYPE=CELL:+98765456789
+EMAIL:david.warner@example.com
 URL:https://example.com
-ADR:;;123 Main St;City;State;12345;Country
+ADR:;;678 Main St;Sydney;NSW;12345;Australia
 NOTE:This is a sample vCard.
 END:VCARD"""
 
