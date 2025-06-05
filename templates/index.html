@@ -1,34 +1,58 @@
-{% if qr_generated %}
-    <h3>Your QR Code:</h3>
-    <img id="qrImage" src="{{ url_for('static', filename='vcard_qr.png') }}" alt="vCard QR Code" width="200"><br><br>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>vCard QR Generator</title>
+</head>
+<body>
+    <h1>vCard QR Code Generator</h1>
 
-    <!-- Download Button -->
-    <a href="{{ url_for('static', filename='vcard_qr.png') }}" download="vcard_qr.png">
-        <button>Download QR Code</button>
-    </a>
+    <form action="/" method="post">
+        <label>First Name: <input type="text" name="firstName" required></label><br>
+        <label>Last Name: <input type="text" name="lastName" required></label><br>
+        <label>Organization: <input type="text" name="organization"></label><br>
+        <label>Title: <input type="text" name="title"></label><br>
+        <label>Phone: <input type="text" name="phone"></label><br>
+        <label>Email: <input type="email" name="email"></label><br>
+        <label>Website: <input type="url" name="url"></label><br>
+        <label>Address: <input type="text" name="address"></label><br>
+        <label>Note: <input type="text" name="note"></label><br><br>
+        <button type="submit">Generate QR Code</button>
+    </form>
 
-    <!-- Share Button -->
-    <button onclick="shareQR()">Share QR Code</button>
+    {% if qr_generated %}
+        <h3>Your QR Code:</h3>
+        <img id="qrImage" src="{{ url_for('static', filename='vcard_qr.png') }}" alt="vCard QR Code" width="200"><br><br>
 
-    <script>
-        async function shareQR() {
-            if (navigator.canShare && navigator.canShare({ files: [] })) {
-                const response = await fetch("{{ url_for('static', filename='vcard_qr.png') }}");
-                const blob = await response.blob();
-                const file = new File([blob], "vcard_qr.png", { type: "image/png" });
+        <!-- Download Button -->
+        <a href="{{ url_for('static', filename='vcard_qr.png') }}" download="vcard_qr.png">
+            <button type="button">Download QR Code</button>
+        </a>
 
+        <!-- Share Button -->
+        <button type="button" onclick="shareQR()">Share QR Code</button>
+
+        <script>
+            async function shareQR() {
                 try {
-                    await navigator.share({
-                        title: "vCard QR Code",
-                        text: "Here's my contact QR",
-                        files: [file]
-                    });
-                } catch (err) {
-                    alert("Share failed: " + err);
+                    const response = await fetch("{{ url_for('static', filename='vcard_qr.png') }}");
+                    const blob = await response.blob();
+                    const file = new File([blob], "vcard_qr.png", { type: "image/png" });
+
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        await navigator.share({
+                            title: "vCard QR Code",
+                            text: "Here’s my contact QR code.",
+                            files: [file]
+                        });
+                    } else {
+                        alert("Sharing is not supported on your device or browser.");
+                    }
+                } catch (error) {
+                    console.error("Share failed:", error);
+                    alert("An error occurred while sharing.");
                 }
-            } else {
-                alert("Sharing not supported on this device/browser.");
             }
-        }
-    </script>
-{% endif %}
+        </script>
+    {% endif %}
+</body>
+</html>

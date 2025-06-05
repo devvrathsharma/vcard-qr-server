@@ -1,5 +1,3 @@
-import os
-from flask import Flask, send_file, render_template
 from flask import Flask, render_template, request
 import qrcode
 import os
@@ -10,7 +8,6 @@ app = Flask(__name__)
 def index():
     qr_generated = False
     if request.method == "POST":
-        # Get form data
         data = request.form
         vcard = f"""BEGIN:VCARD
 VERSION:3.0
@@ -25,7 +22,7 @@ ADR:;;{data.get('address', '')}
 NOTE:{data.get('note', '')}
 END:VCARD"""
 
-        # Generate QR
+        # Generate QR and save
         os.makedirs("static", exist_ok=True)
         img = qrcode.make(vcard)
         img.save("static/vcard_qr.png")
@@ -36,17 +33,3 @@ END:VCARD"""
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
-
-app = Flask(__name__)
-
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-@app.route('/qr')
-def serve_qr():
-    return send_file('static/vcard_qr.png', mimetype='image/png')
-
-if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 10000))
-    app.run(host='0.0.0.0', port=port)
