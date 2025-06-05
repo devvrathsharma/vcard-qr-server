@@ -1,11 +1,26 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Scan to Save Contact</title>
+    <title>vCard QR Generator</title>
 </head>
-<body style="text-align:center; margin-top: 50px;">
-  <h2>Scan This QR Code</h2>
-  <img src="/qr" alt="vCard QR Code" width="300">
-  <p>This QR adds contact details to your phone.</p>
+<body>
+    <h1>vCard QR Code Generator</h1>
+    <form action="/" method="post">
+        <label>First Name: <input type="text" name="firstName" required></label><br>
+        <label>Last Name: <input type="text" name="lastName" required></label><br>
+        <label>Organization: <input type="text" name="organization"></label><br>
+        <label>Title: <input type="text" name="title"></label><br>
+        <label>Phone: <input type="text" name="phone"></label><br>
+        <label>Email: <input type="email" name="email"></label><br>
+        <label>Website: <input type="url" name="url"></label><br>
+        <label>Address: <input type="text" name="address"></label><br>
+        <label>Note: <input type="text" name="note"></label><br>
+        <button type="submit">Generate QR Code</button>
+    </form>
+
+    {% if qr_generated %}
+        <h3>Your QR Code:</h3>
+        <img src="{{ url_for('static', filename='vcard_qr.png') }}" alt="vCard QR Code">
+    {% endif %}
 </body>
 </html>
