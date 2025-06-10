@@ -1,19 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>OTP Login</title>
+  <title>Login with OTP</title>
 </head>
 <body>
+  <h2>Login with Mobile Number</h2>
+
   <input type="text" id="phone" placeholder="Enter mobile number">
   <div id="recaptcha-container"></div>
   <button onclick="sendOTP()">Send OTP</button>
 
+  <br><br>
+
   <input type="text" id="otp" placeholder="Enter OTP">
   <button onclick="verifyOTP()">Verify OTP</button>
 
+  <!-- ✅ Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
 
+  <!-- ✅ Firebase Config & Logic -->
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyAMQc-IsLnXdo0xd30-Qmhror6bPgxblz8", 
@@ -22,11 +28,18 @@
       appId: "1:422713140031:web:d861522c2955bc1a44a98a"
     };
 
+    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
 
-    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-      size: 'invisible'
-    });
+    window.onload = function () {
+      window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+        size: 'invisible',
+        callback: function(response) {
+          console.log("reCAPTCHA solved");
+        }
+      });
+      recaptchaVerifier.render();
+    };
 
     function sendOTP() {
       const phoneNumber = "+91" + document.getElementById("phone").value;
@@ -37,7 +50,7 @@
           window.confirmationResult = confirmationResult;
           alert("OTP sent!");
         }).catch((error) => {
-          alert(error.message);
+          alert("Error sending OTP: " + error.message);
         });
     }
 
@@ -45,7 +58,7 @@
       const code = document.getElementById("otp").value;
       window.confirmationResult.confirm(code)
         .then((result) => {
-          alert("Login success!");
+          alert("Login successful!");
         }).catch((error) => {
           alert("Incorrect OTP");
         });
