@@ -1,56 +1,54 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Login with Phone</title>
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+  <title>OTP Login</title>
 </head>
 <body>
-  <h2>Login with Phone</h2>
-  <input type="text" id="phoneNumber" placeholder="+911234567890">
+  <input type="text" id="phone" placeholder="Enter mobile number">
   <div id="recaptcha-container"></div>
   <button onclick="sendOTP()">Send OTP</button>
 
-  <br><br>
   <input type="text" id="otp" placeholder="Enter OTP">
   <button onclick="verifyOTP()">Verify OTP</button>
 
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+
   <script>
-    // Firebase config
     const firebaseConfig = {
-      apiKey: "AIzaSyAMQc-IsLnXdo0xd30-Qmhror6bPgxblz8",
-      authDomain: "qr-code-96003.firebaseapp.com",
-      projectId: "qr-code-96003",
+      apiKey: "AIzaSyAMQc-IsLnXdo0xd30-Qmhror6bPgxblz8", 
+      authDomain: "qr-code-96003.firebaseapp.com", 
+      projectId: "qr-code-96003", 
       appId: "1:422713140031:web:d861522c2955bc1a44a98a"
     };
+
     firebase.initializeApp(firebaseConfig);
 
     window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-      'size': 'normal',
-      'callback': () => {}
+      size: 'invisible'
     });
 
     function sendOTP() {
-      const phone = document.getElementById('phoneNumber').value;
-      firebase.auth().signInWithPhoneNumber(phone, window.recaptchaVerifier)
-        .then(confirmationResult => {
+      const phoneNumber = "+91" + document.getElementById("phone").value;
+      const appVerifier = window.recaptchaVerifier;
+
+      firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
+        .then((confirmationResult) => {
           window.confirmationResult = confirmationResult;
           alert("OTP sent!");
-        }).catch(console.error);
+        }).catch((error) => {
+          alert(error.message);
+        });
     }
 
     function verifyOTP() {
-      const code = document.getElementById('otp').value;
-      window.confirmationResult.confirm(code).then(result => {
-        // Send UID to Flask
-        fetch('/session-login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ uid: result.user.uid })
-        }).then(() => {
-          window.location.href = '/';
+      const code = document.getElementById("otp").value;
+      window.confirmationResult.confirm(code)
+        .then((result) => {
+          alert("Login success!");
+        }).catch((error) => {
+          alert("Incorrect OTP");
         });
-      }).catch(error => alert("Invalid OTP"));
     }
   </script>
 </body>
