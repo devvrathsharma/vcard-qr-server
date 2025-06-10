@@ -1,76 +1,59 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Login with OTP</title>
-</head>
-<body>
-  <h2>Login with Mobile Number</h2>
+  <head>
+    <meta charset="UTF-8">
+    <title>Login with Phone OTP</title>
 
-  <input type="text" id="phone" placeholder="Enter mobile number">
-  <div id="recaptcha-container"></div>
-  <button onclick="sendOTP()">Send OTP</button>
+    <!-- ✅ Firebase SDKs (Compat versions for FirebaseUI) -->
+    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-auth-compat.js"></script>
 
-  <br><br>
+    <!-- ✅ Firebase UI CSS & JS -->
+    <script src="https://www.gstatic.com/firebasejs/ui/6.1.0/firebase-ui-auth.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/6.1.0/firebase-ui-auth.css" />
 
-  <input type="text" id="otp" placeholder="Enter OTP">
-  <button onclick="verifyOTP()">Verify OTP</button>
+    <!-- ✅ Initialize Firebase -->
+    <script type="text/javascript">
+      // 🔐 Replace with your actual config from Firebase Console > Project Settings > Web App
+      const firebaseConfig = {
+        apiKey: "AIzaSyAMQc-IsLnXdo0xd30-Qmhror6bPgxblz8", 
+        authDomain: "qr-code-96003.firebaseapp.com", 
+        projectId: "qr-code-96003", 
+        appId: "1:422713140031:web:d861522c2955bc1a44a98a"
+      };
 
-  <!-- ✅ Firebase SDKs -->
-  <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-app.js'
+      // 🔧 Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+    </script>
 
-    // If you enabled Analytics in your project, add the Firebase SDK for Google Analytics
-    import { getAnalytics } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-analytics.js'
-
-    // Add Firebase products that you want to use
-    import { getAuth } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js'
-    import { getFirestore } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js'
-  </script>
-
-  <!-- ✅ Firebase Config & Logic -->
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyAMQc-IsLnXdo0xd30-Qmhror6bPgxblz8", 
-      authDomain: "qr-code-96003.firebaseapp.com", 
-      projectId: "qr-code-96003", 
-      appId: "1:422713140031:web:d861522c2955bc1a44a98a"
-    };
-
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-
-    window.onload = function () {
-      window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-        size: 'invisible',
-        callback: function(response) {
-          console.log("reCAPTCHA solved");
+    <!-- ✅ Firebase UI Config -->
+    <script type="text/javascript">
+      const uiConfig = {
+        signInSuccessUrl: "/success.html", // Or any route after login
+        signInOptions: [
+          {
+            provider: firebase.auth.PhoneAuthProvider.PROVIDER_ID,
+            defaultCountry: 'IN'
+          }
+        ],
+        tosUrl: "/terms.html",
+        privacyPolicyUrl: function () {
+          window.location.assign("/privacy.html");
         }
-      });
-      recaptchaVerifier.render();
-    };
+      };
 
-    function sendOTP() {
-      const phoneNumber = "+91" + document.getElementById("phone").value;
-      const appVerifier = window.recaptchaVerifier;
+      // ✅ Initialize FirebaseUI Auth
+      const ui = new firebaseui.auth.AuthUI(firebase.auth());
 
-      firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
-        .then((confirmationResult) => {
-          window.confirmationResult = confirmationResult;
-          alert("OTP sent!");
-        }).catch((error) => {
-          alert("Error sending OTP: " + error.message);
-        });
-    }
+      // 🔃 Start UI once DOM is ready
+      window.onload = function () {
+        ui.start("#firebaseui-auth-container", uiConfig);
+      };
+    </script>
+  </head>
 
-    function verifyOTP() {
-      const code = document.getElementById("otp").value;
-      window.confirmationResult.confirm(code)
-        .then((result) => {
-          alert("Login successful!");
-        }).catch((error) => {
-          alert("Incorrect OTP");
-        });
-    }
-  </script>
-</body>
+  <body>
+    <h2>Sign in with your Mobile Number</h2>
+    <div id="firebaseui-auth-container"></div>
+  </body>
 </html>
