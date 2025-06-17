@@ -1,58 +1,74 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>vCard QR Generator</title>
-</head>
-<body>
-    <h1>vCard QR Code Generator</h1>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Login with Email</title>
+    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-auth-compat.js"></script>
+  </head>
+  <body>
+    <h2>Login or Sign Up</h2>
 
-    <form action="/" method="post">
-        <label>First Name: <input type="text" name="firstName" required></label><br>
-        <label>Last Name: <input type="text" name="lastName" required></label><br>
-        <label>Organization: <input type="text" name="organization"></label><br>
-        <label>Title: <input type="text" name="title"></label><br>
-        <label>Phone: <input type="text" name="phone"></label><br>
-        <label>Email: <input type="email" name="email"></label><br>
-        <label>Website: <input type="url" name="url"></label><br>
-        <label>Address: <input type="text" name="address"></label><br>
-        <label>Note: <input type="text" name="note"></label><br><br>
-        <button type="submit">Generate QR Code</button>
-    </form>
+    <div>
+      <label>Email:</label>
+      <input type="email" id="email" /><br />
 
-    {% if qr_generated %}
-        <h3>Your QR Code:</h3>
-        <img id="qrImage" src="{{ url_for('static', filename='vcard_qr.png') }}" alt="vCard QR Code" width="200"><br><br>
+      <label>Password:</label>
+      <input type="password" id="password" /><br />
 
-        <!-- Download Button -->
-        <a href="{{ url_for('static', filename='vcard_qr.png') }}" download="vcard_qr.png">
-            <button type="button">Download QR Code</button>
-        </a>
+      <button onclick="signUp()">Sign Up</button>
+      <button onclick="login()">Login</button>
+      <button onclick="logout()">Logout</button>
+    </div>
 
-        <!-- Share Button -->
-        <button type="button" onclick="shareQR()">Share QR Code</button>
+    <p id="status"></p>
 
-        <script>
-            async function shareQR() {
-                try {
-                    const response = await fetch("{{ url_for('static', filename='vcard_qr.png') }}");
-                    const blob = await response.blob();
-                    const file = new File([blob], "vcard_qr.png", { type: "image/png" });
+    <script>
+      // Replace with your Firebase config
+      const firebaseConfig = {
+        apiKey: "AIzaSyAMQc-IsLnXdo0xd30-Qmhror6bPgxblz8",
+        authDomain: "qr-code-96003.firebaseapp.com",
+        projectId: "qr-code-96003",
+        appId: "1:422713140031:web:d861522c2955bc1a44a98a"
+      };
 
-                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                        await navigator.share({
-                            title: "vCard QR Code",
-                            text: "Here’s my contact QR code.",
-                            files: [file]
-                        });
-                    } else {
-                        alert("Sharing is not supported on your device or browser.");
-                    }
-                } catch (error) {
-                    console.error("Share failed:", error);
-                    alert("An error occurred while sharing.");
-                }
-            }
-        </script>
-    {% endif %}
-</body>
+      firebase.initializeApp(firebaseConfig);
+      const auth = firebase.auth();
+
+      // Sign up
+      function signUp() {
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+
+        auth.createUserWithEmailAndPassword(email, password)
+          .then((userCredential) => {
+            document.getElementById("status").innerText = "User created!";
+          })
+          .catch((error) => {
+            document.getElementById("status").innerText = error.message;
+          });
+      }
+
+      // Login
+      function login() {
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+
+        auth.signInWithEmailAndPassword(email, password)
+          .then((userCredential) => {
+            document.getElementById("status").innerText = "Login successful!";
+          })
+          .catch((error) => {
+            document.getElementById("status").innerText = error.message;
+          });
+      }
+
+      // Logout
+      function logout() {
+        auth.signOut().then(() => {
+          document.getElementById("status").innerText = "Logged out.";
+        });
+      }
+    </script>
+  </body>
 </html>

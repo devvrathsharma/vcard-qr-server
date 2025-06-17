@@ -24,6 +24,8 @@
 
       // 🔧 Initialize Firebase
       firebase.initializeApp(firebaseConfig);
+      firebase.auth().useEmulator("http://localhost:9099");
+
     </script>
 
     <!-- ✅ Firebase UI Config -->
