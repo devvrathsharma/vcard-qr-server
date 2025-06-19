@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>vCard QR Generator</title>
+  <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-auth-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+</head>
+<body>
+  <h2>Generate Your vCard QR Code</h2>
+
+  <form id="vcardForm">
+    <label>Name:</label><input type="text" id="name" required><br>
+    <label>Phone:</label><input type="text" id="phone" required><br>
+    <label>Email:</label><input type="email" id="email" required><br>
+    <label>Organization:</label><input type="text" id="org"><br>
+    <label>Title:</label><input type="text" id="title"><br>
+    <button type="submit">Generate QR</button>
+  </form>
+
+  <br>
+  <div id="qrcode"></div>
+
+  <br>
+  <button onclick="logout()">Logout</button>
+
+  <script>
+    // Firebase config
+    const firebaseConfig = {
+        apiKey: "AIzaSyAMQc-IsLnXdo0xd30-Qmhror6bPgxblz8",
+        authDomain: "qr-code-96003.firebaseapp.com",
+        projectId: "qr-code-96003",
+        appId: "1:422713140031:web:d861522c2955bc1a44a98a"
+      };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    // ✅ Protect Page - Allow only logged-in users
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        window.location.href = "/login.html";
+      }
+    });
+
+    // 🚪 Logout function
+    function logout() {
+      auth.signOut().then(() => {
+        window.location.href = "/login.html";
+      });
+    }
+
+    // 🎯 vCard QR generation logic
+    document.getElementById("vcardForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const name = document.getElementById("name").value;
+      const phone = document.getElementById("phone").value;
+      const email = document.getElementById("email").value;
+      const org = document.getElementById("org").value;
+      const title = document.getElementById("title").value;
+
+      const vcardData =
+        `BEGIN:VCARD\nVERSION:3.0\nFN:${name}\nORG:${org}\nTITLE:${title}\nTEL:${phone}\nEMAIL:${email}\nEND:VCARD`;
+
+      QRCode.toCanvas(document.createElement("canvas"), vcardData, function (err, canvas) {
+        const qrDiv = document.getElementById("qrcode");
+        qrDiv.innerHTML = ""; // Clear previous
+        qrDiv.appendChild(canvas);
+      });
+    });
+  </script>
+</body>
+</html>
