@@ -1,81 +1,95 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>vCard QR Generator</title>
-  <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-auth-compat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 2rem;
+    }
+    form {
+      margin-bottom: 1rem;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input {
+      padding: 6px;
+      width: 300px;
+      max-width: 90%;
+    }
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+    #qrcode {
+      margin-top: 20px;
+    }
+  </style>
 </head>
 <body>
   <h2>Generate Your vCard QR Code</h2>
 
   <form id="vcardForm">
-    <label>Name:</label><input type="text" id="name" required><br>
-    <label>Phone:</label><input type="text" id="phone" required><br>
-    <label>Email:</label><input type="email" id="email" required><br>
-    <label>Organization:</label><input type="text" id="org"><br>
-    <label>Title:</label><input type="text" id="title"><br>
+    <label for="name">Full Name:</label>
+    <input type="text" id="name" placeholder="John Doe" required>
+
+    <label for="org">Organization:</label>
+    <input type="text" id="org" placeholder="Acme Inc.">
+
+    <label for="title">Title:</label>
+    <input type="text" id="title" placeholder="Software Engineer">
+
+    <label for="phone">Phone Number:</label>
+    <input type="text" id="phone" placeholder="+1234567890" required>
+
+    <label for="email">Email:</label>
+    <input type="email" id="email" placeholder="john@example.com" required>
+
     <button type="submit">Generate QR</button>
   </form>
 
-  <br>
   <div id="qrcode"></div>
 
-  <br>
-  <button onclick="logout()">Logout</button>
-
   <script>
-    // Firebase config
-    const firebaseConfig = {
-        apiKey: "AIzaSyAMQc-IsLnXdo0xd30-Qmhror6bPgxblz8",
-        authDomain: "qr-code-96003.firebaseapp.com",
-        projectId: "qr-code-96003",
-        appId: "1:422713140031:web:d861522c2955bc1a44a98a"
-      };
-
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-
-    // ✅ Protect Page - Allow only logged-in users
-    auth.onAuthStateChanged(user => {
-      if (!user) {
-        window.location.href = "/login.html";
-      }
-    });
-
-    // 🚪 Logout function
-    function logout() {
-      auth.signOut().then(() => {
-        window.location.href = "/login.html";
-      });
-    }
-
     function escapeVCard(text) {
-      return text.replace(/\\/g, '\\\\')  // escape backslashes
-                 .replace(/;/g, '\\;')    // escape semicolons
-                 .replace(/,/g, '\\,');   // escape commas
+      return text
+        .replace(/\\/g, '\\\\')
+        .replace(/\n/g, '\\n')
+        .replace(/;/g, '\\;')
+        .replace(/,/g, '\\,');
     }
-  
-    // 🎯 vCard QR generation logic
+
     document.getElementById("vcardForm").addEventListener("submit", function (e) {
       e.preventDefault();
-  
+
       const name = escapeVCard(document.getElementById("name").value);
-      const phone = escapeVCard(document.getElementById("phone").value);
-      const email = escapeVCard(document.getElementById("email").value);
       const org = escapeVCard(document.getElementById("org").value);
       const title = escapeVCard(document.getElementById("title").value);
-  
+      const phone = escapeVCard(document.getElementById("phone").value);
+      const email = escapeVCard(document.getElementById("email").value);
+
+      const fullName = name || "Unnamed";
+      const phoneEntry = phone ? `TEL;TYPE=CELL:${phone}\n` : "";
+      const emailEntry = email ? `EMAIL:${email}\n` : "";
+      const orgEntry = org ? `ORG:${org}\n` : "";
+      const titleEntry = title ? `TITLE:${title}\n` : "";
+
       const vcardData =
-        `BEGIN:VCARD\nVERSION:3.0\nFN:${name}\nORG:${org}\nTITLE:${title}\nTEL:${phone}\nEMAIL:${email}\nEND:VCARD`;
-  
+        `BEGIN:VCARD\nVERSION:3.0\nFN:${fullName}\n` +
+        `${orgEntry}${titleEntry}${phoneEntry}${emailEntry}` +
+        `END:VCARD`;
+
       QRCode.toCanvas(document.createElement("canvas"), vcardData, function (err, canvas) {
         const qrDiv = document.getElementById("qrcode");
-        qrDiv.innerHTML = ""; // Clear previous
+        qrDiv.innerHTML = "";
         qrDiv.appendChild(canvas);
       });
     });
-  
   </script>
 </body>
 </html>
