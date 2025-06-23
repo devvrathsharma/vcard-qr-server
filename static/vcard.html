@@ -53,6 +53,11 @@
     <button type="submit">Generate QR</button>
   </form>
 
+  <div style="text-align: right;">
+    <button onclick="logout()">Logout</button>
+  </div>
+  
+
   <div id="qrcode"></div>
 
   <script>
@@ -96,6 +101,16 @@
         qrDiv.appendChild(canvas);
       });
     });
+
+    function logout() {
+      fetch("/logout")
+        .then(() => {
+          window.location.href = "/login";
+        })
+        .catch((err) => {
+          console.error("Logout failed:", err);
+        });
+    }
   </script>
   
 </body>
