@@ -63,27 +63,33 @@
         .replace(/;/g, '\\;')
         .replace(/,/g, '\\,');
     }
-
+  
     document.getElementById("vcardForm").addEventListener("submit", function (e) {
       e.preventDefault();
-
-      const name = escapeVCard(document.getElementById("name").value);
+  
+      const nameInput = document.getElementById("name").value.trim();
+      const nameParts = nameInput.split(" ");
+      const firstName = escapeVCard(nameParts[0] || "");
+      const lastName = escapeVCard(nameParts.slice(1).join(" ") || "");
+      const fullName = escapeVCard(nameInput);
+  
       const org = escapeVCard(document.getElementById("org").value);
       const title = escapeVCard(document.getElementById("title").value);
       const phone = escapeVCard(document.getElementById("phone").value);
       const email = escapeVCard(document.getElementById("email").value);
-
-      const fullName = name || "Unnamed";
+  
       const phoneEntry = phone ? `TEL;TYPE=CELL:${phone}\n` : "";
       const emailEntry = email ? `EMAIL:${email}\n` : "";
       const orgEntry = org ? `ORG:${org}\n` : "";
       const titleEntry = title ? `TITLE:${title}\n` : "";
-
+  
       const vcardData =
-        `BEGIN:VCARD\nVERSION:3.0\nFN:${fullName}\n` +
+        `BEGIN:VCARD\nVERSION:3.0\n` +
+        `N:${lastName};${firstName};;;\n` +
+        `FN:${fullName}\n` +
         `${orgEntry}${titleEntry}${phoneEntry}${emailEntry}` +
         `END:VCARD`;
-
+  
       QRCode.toCanvas(document.createElement("canvas"), vcardData, function (err, canvas) {
         const qrDiv = document.getElementById("qrcode");
         qrDiv.innerHTML = "";
@@ -91,5 +97,6 @@
       });
     });
   </script>
+  
 </body>
 </html>
