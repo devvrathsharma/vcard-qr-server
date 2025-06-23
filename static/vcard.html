@@ -50,25 +50,32 @@
       });
     }
 
+    function escapeVCard(text) {
+      return text.replace(/\\/g, '\\\\')  // escape backslashes
+                 .replace(/;/g, '\\;')    // escape semicolons
+                 .replace(/,/g, '\\,');   // escape commas
+    }
+  
     // 🎯 vCard QR generation logic
     document.getElementById("vcardForm").addEventListener("submit", function (e) {
       e.preventDefault();
-
-      const name = document.getElementById("name").value;
-      const phone = document.getElementById("phone").value;
-      const email = document.getElementById("email").value;
-      const org = document.getElementById("org").value;
-      const title = document.getElementById("title").value;
-
+  
+      const name = escapeVCard(document.getElementById("name").value);
+      const phone = escapeVCard(document.getElementById("phone").value);
+      const email = escapeVCard(document.getElementById("email").value);
+      const org = escapeVCard(document.getElementById("org").value);
+      const title = escapeVCard(document.getElementById("title").value);
+  
       const vcardData =
         `BEGIN:VCARD\nVERSION:3.0\nFN:${name}\nORG:${org}\nTITLE:${title}\nTEL:${phone}\nEMAIL:${email}\nEND:VCARD`;
-
+  
       QRCode.toCanvas(document.createElement("canvas"), vcardData, function (err, canvas) {
         const qrDiv = document.getElementById("qrcode");
         qrDiv.innerHTML = ""; // Clear previous
         qrDiv.appendChild(canvas);
       });
     });
+  
   </script>
 </body>
 </html>
