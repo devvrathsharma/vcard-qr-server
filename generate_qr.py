@@ -4,7 +4,7 @@ import qrcode
 vcard = """BEGIN:VCARD
 VERSION:3.0
 N:Smith;Steve;;;
-FN:David Warner
+FN:David Smith
 ORG:Australian Cricket Team
 TITLE:Batter
 TEL;TYPE=CELL:+98765456789
